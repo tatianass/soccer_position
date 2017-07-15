@@ -67,7 +67,11 @@ anova_report <- function(analysis, type){
 #@return {formula}, nn formula
 getFormulaNN <- function(data){
   n <- colnames(data)
-  f <- as.formula(paste("id_position ~", paste(n[!n %in% c("id_position", "(Intercept)")], collapse = " + ")))
+  f <- as.formula(paste(" positionCB + positionCDM + positionCM + 
+    positionGK + positionLAM + positionLB + positionLCB + positionLCM + 
+                        positionLDM + positionLM + positionLS + positionLW + positionRAM + 
+                        positionRB + positionRCB + positionRCM + positionRDM + positionRM + 
+                        positionRS + positionRW + positionST + positionSUB ~", paste(n[!n %in% c("positionCB","positionCDM","positionCM","positionGK","positionLAM","positionLB","positionLCB","positionLCM","positionLDM","positionLM","positionLS","positionLW","positionRAM","positionRB","positionRCB","positionRCM","positionRDM","positionRM","positionRS","positionRW","positionST","positionSUB", "(Intercept)")], collapse = " + ")))
   return(f)
 }
 
