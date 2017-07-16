@@ -40,5 +40,5 @@ gk_positioning           1      202     202     2.598 0.107023
 gk_reflexes              1      230     230     2.964 0.085113 .  
 Residuals           158710 12317808      78                       
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  0 â€˜***â€™ 0.001 â€˜**â€™ 0.01 â€˜*â€™ 0.05 â€˜.â€™ 0.1 â€˜ â€™ 1
 4 observations deleted due to missingness
