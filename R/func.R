@@ -85,6 +85,37 @@ getFormulaMatrix <- function(data){
   return(f)
 }
 
+
+# Responsible for creating file name
+#@param {character} name, file name
+#@param {character} ext, file extension 
 addFileExtension <- function(name, ext){
   return(paste(name, ext, sep = ""))
+}
+
+# Responsible for converting predicted variables to factor
+modelToFactor <- function(){
+  model_data$positionCB <- as.factor(model_data$positionCB)
+  model_data$positionCDM <- as.factor(model_data$positionCDM)
+  model_data$positionCM <- as.factor(model_data$positionCM)
+  model_data$positionGK <- as.factor(model_data$positionGK)
+  model_data$positionLAM <- as.factor(model_data$positionLAM)
+  model_data$positionLB <- as.factor(model_data$positionLB)
+  model_data$positionLCB <- as.factor(model_data$positionLCB)
+  model_data$positionLCM <- as.factor(model_data$positionLCM)
+  model_data$positionLDM <- as.factor(model_data$positionLDM)
+  model_data$positionLM <- as.factor(model_data$positionLM)
+  model_data$positionLS <- as.factor(model_data$positionLS)
+  model_data$positionLW <- as.factor(model_data$positionLW)
+  model_data$positionRAM <- as.factor(model_data$positionRAM)
+  model_data$positionRB <- as.factor(model_data$positionRB)
+  model_data$positionRCB <- as.factor(model_data$positionRCB)
+  model_data$positionRCM <- as.factor(model_data$positionRCM)
+  model_data$positionRDM <- as.factor(model_data$positionRDM)
+  model_data$positionRM <- as.factor(model_data$positionRM)
+  model_data$positionRS <- as.factor(model_data$positionRS)
+  model_data$positionRW <- as.factor(model_data$positionRW)
+  model_data$positionST <- as.factor(model_data$positionST)
+  model_data$positionSU <- as.factor(model_data$positionSU)
+  return(model_data)
 }

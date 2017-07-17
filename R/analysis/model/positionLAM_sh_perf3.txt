@@ -1,0 +1,19 @@
+Scoring History: 
+            timestamp   duration training_speed   epochs iterations        samples training_rmse
+1 2017-07-17 00:30:34  0.000 sec                 0.00000          0       0.000000              
+2 2017-07-17 00:30:36  2.685 sec  64755 obs/sec  0.89912          1  100047.000000       0.03177
+3 2017-07-17 00:30:46 12.044 sec 177615 obs/sec 17.08280         19 1900837.000000       0.03176
+4 2017-07-17 00:30:48 14.275 sec 180627 obs/sec 20.67588         23 2300647.000000       0.03167
+5 2017-07-17 00:30:48 14.463 sec 180627 obs/sec 20.67588         23 2300647.000000       0.03177
+  training_logloss training_auc training_lift training_classification_error validation_rmse
+1                                                                                          
+2          0.01477      0.84919       0.00000                       0.05752         0.03955
+3          0.01331      0.89890      39.63600                       0.00283         0.03954
+4          0.01377      0.84704      39.63600                       0.00151         0.03939
+5          0.01477      0.84919       0.00000                       0.05752         0.03955
+  validation_logloss validation_auc validation_lift validation_classification_error
+1                                                                                  
+2            0.02355        0.80469         2.69700                         0.13742
+3            0.02497        0.76087        24.27301                         0.00347
+4            0.02730        0.73502        26.97001                         0.00402
+5            0.02355        0.80469         2.69700                         0.13742

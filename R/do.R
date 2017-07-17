@@ -11,10 +11,6 @@ csv_ext <- ".csv"
 #+#+#+ SPLITTING (TRAIN/TEST) #+#+
 ##################################
 
-f_matrix <- getFormulaMatrix(data)
-
-model_data <- as.data.frame(model.matrix(f_matrix, data))
-
 n_label <- "positionCB"
 y <- c("positionCB","positionCDM","positionCM","positionGK","positionLAM","positionLB","positionLCB","positionLCM","positionLDM","positionLM","positionLS","positionLW","positionRAM","positionRB","positionRCB","positionRCM","positionRDM","positionRM","positionRS","positionRW","positionST","positionSUB")
 x <- setdiff(names(model_data), c(y, "(Intercept)"))
@@ -22,9 +18,32 @@ x <- setdiff(names(model_data), c(y, "(Intercept)"))
 #transform dataframe dummies to matrix
 model_data <- as.h2o(model_data)
 
-model_data[, 2:23] <- lapply(model_data[, 2:23], as.factor)
+#convert to factor
 model_data$positionCB <- as.factor(model_data$positionCB)
-levels(model_data$positionCB)
+model_data$positionCDM <- as.factor(model_data$positionCDM)
+model_data$positionCM <- as.factor(model_data$positionCM)
+model_data$positionGK <- as.factor(model_data$positionGK)
+model_data$positionLAM <- as.factor(model_data$positionLAM)
+model_data$positionLB <- as.factor(model_data$positionLB)
+model_data$positionLCB <- as.factor(model_data$positionLCB)
+model_data$positionLCM <- as.factor(model_data$positionLCM)
+model_data$positionLDM <- as.factor(model_data$positionLDM)
+model_data$positionLM <- as.factor(model_data$positionLM)
+model_data$positionLS <- as.factor(model_data$positionLS)
+model_data$positionLW <- as.factor(model_data$positionLW)
+model_data$positionRAM <- as.factor(model_data$positionRAM)
+model_data$positionRB <- as.factor(model_data$positionRB)
+model_data$positionRCB <- as.factor(model_data$positionRCB)
+model_data$positionRCM <- as.factor(model_data$positionRCM)
+model_data$positionRDM <- as.factor(model_data$positionRDM)
+model_data$positionRM <- as.factor(model_data$positionRM)
+model_data$positionRS <- as.factor(model_data$positionRS)
+model_data$positionRW <- as.factor(model_data$positionRW)
+model_data$positionST <- as.factor(model_data$positionST)
+model_data$positionSUB <- as.factor(model_data$positionSUB)
+
+#test factor
+h2o.levels(model_data$positionRCB)
 
 # Partition the data into training, validation and test sets
 splits <- h2o.splitFrame(data = model_data, 
@@ -94,22 +113,35 @@ for(n_label in y){
                               newdata = test)
   
   # Print model performance
-  dl_perf1
-  dl_perf2
-  dl_perf3
+  path <- paste("analysis/model/", n_label, sep="")
+  s<-dl_perf1
+  capture.output(s, file = addFileExtension(paste(path,"model_perf1", sep="_"), txt_ext))
+  s<-dl_perf2
+  capture.output(s, file = addFileExtension(paste(path,"model_perf2", sep="_"), txt_ext))
+  s<-dl_perf3
+  capture.output(s, file = addFileExtension(paste(path,"model_perf3", sep="_"), txt_ext))
+  
+  
   
   # Retreive test set AUC
-  h2o.auc(dl_perf1)  
-  h2o.auc(dl_perf2)  
-  h2o.auc(dl_perf3)  
+  s<-h2o.auc(dl_perf1)
+  capture.output(s, file = addFileExtension(paste(path,"auc_perf1", sep="_"), txt_ext))
+  s<-h2o.auc(dl_perf2)
+  capture.output(s, file = addFileExtension(paste(path,"auc_perf2", sep="_"), txt_ext))
+  s<-h2o.auc(dl_perf3)
+  capture.output(s, file = addFileExtension(paste(path,"auc_perf3", sep="_"), txt_ext))
+  
   
   # Scoring history
-  h2o.scoreHistory(dl_fit3)
+  s<-h2o.scoreHistory(dl_fit3)
+  capture.output(s, file = addFileExtension(paste(path,"sh_perf3", sep="_"), txt_ext))
   
   # Look at scoring history for third DL model
+  png(filename=addFileExtension(paste(path,"sh_perf3", sep="_"), png_ext))
   plot(dl_fit3, 
        timestep = "epochs", 
        metric = "AUC")
+  dev.off()
 }
 
 dbDisconnect()

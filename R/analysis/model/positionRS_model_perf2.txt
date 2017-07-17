@@ -1,0 +1,29 @@
+H2OBinomialMetrics: deeplearning
+
+MSE:  0.01359909
+RMSE:  0.1166152
+LogLoss:  0.07043821
+Mean Per-Class Error:  0.4137622
+AUC:  0.8553023
+Gini:  0.7106047
+
+Confusion Matrix (vertical: actual; across: predicted) for F1-optimal threshold:
+           0   1    Error         Rate
+0      22697 804 0.034211   =804/23501
+1        261  68 0.793313     =261/329
+Totals 22958 872 0.044692  =1065/23830
+
+Maximum Metrics: Maximum metrics at their respective thresholds
+                        metric threshold    value idx
+1                       max f1  0.050135 0.113239 210
+2                       max f2  0.008015 0.214271 336
+3                 max f0point5  0.050135 0.089075 210
+4                 max accuracy  0.649003 0.986152   0
+5                max precision  0.360753 0.181818   9
+6                   max recall  0.000002 1.000000 399
+7              max specificity  0.649003 0.999957   0
+8             max absolute_mcc  0.005454 0.165355 350
+9   max min_per_class_accuracy  0.003436 0.786945 364
+10 max mean_per_class_accuracy  0.001170 0.797259 382
+
+Gains/Lift Table: Extract with `h2o.gainsLift(<model>, <data>)` or `h2o.gainsLift(<model>, valid=<T/F>, xval=<T/F>)`

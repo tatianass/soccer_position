@@ -50,3 +50,9 @@ anova_report(aov_type, ANOVA.PATH)
 #choosing only the variables with hight significance (confidance > 0.05)
 data <- data %>%
   select(-id_player_fifa, -short_passing, -acceleration, -sprint_speed, -balance, -long_shots, -gk_positioning, -gk_reflexes)
+
+
+
+f_matrix <- getFormulaMatrix(data)
+
+model_data <- as.data.frame(model.matrix(f_matrix, data))
