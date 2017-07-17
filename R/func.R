@@ -84,3 +84,7 @@ getFormulaMatrix <- function(data){
   f <- as.formula(paste(" ~", paste(n[!n %in% ""], collapse = " + ")))
   return(f)
 }
+
+addFileExtension <- function(name, ext){
+  return(paste(name, ext, sep = ""))
+}

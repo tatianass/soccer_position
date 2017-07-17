@@ -13,13 +13,7 @@ df <- sqllite_to_dataframe(con)
 
 ## create individual data.frames
 ## omiting na's
-data_Country <- na.omit(df[[1]])
-data_League <- na.omit(df[[2]])
-data_Match <- na.omit(df[[3]])
-data_Player <- na.omit(df[[4]])
 data_Player_Attriutes <- na.omit(df[[5]])
-data_Team <- na.omit(df[[6]])
-data_Team_Attributes <- na.omit(df[[7]])
 
 #join between position and player's attributes
 data <- right_join(positions, data_Player_Attriutes, by = c("id_player_fifa" = "player_fifa_api_id"))

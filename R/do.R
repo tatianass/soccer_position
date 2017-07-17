@@ -2,50 +2,114 @@ source("load.R")
 source("func.R")
 source("clean.R")
 
+
+txt_ext <- ".txt"
+png_ext <- ".png"
+csv_ext <- ".csv"
+
 ##################################
 #+#+#+ SPLITTING (TRAIN/TEST) #+#+
 ##################################
 
 f_matrix <- getFormulaMatrix(data)
 
+model_data <- as.data.frame(model.matrix(f_matrix, data))
+
+n_label <- "positionCB"
+y <- c("positionCB","positionCDM","positionCM","positionGK","positionLAM","positionLB","positionLCB","positionLCM","positionLDM","positionLM","positionLS","positionLW","positionRAM","positionRB","positionRCB","positionRCM","positionRDM","positionRM","positionRS","positionRW","positionST","positionSUB")
+x <- setdiff(names(model_data), c(y, "(Intercept)"))
+
 #transform dataframe dummies to matrix
-model <- model.matrix(f_matrix, data)
+model_data <- as.h2o(model_data)
 
-## 75% of the sample size
-smp_size <- floor(0.75 * nrow(model))
+model_data[, 2:23] <- lapply(model_data[, 2:23], as.factor)
+model_data$positionCB <- as.factor(model_data$positionCB)
+levels(model_data$positionCB)
 
-## set the seed to make your partition reproductible
-set.seed(123)
-train_ind <- sample(seq_len(nrow(model)), size = smp_size)
-
-train <- model[train_ind, ]
-test <- model[-train_ind, ]
-
-
+# Partition the data into training, validation and test sets
+splits <- h2o.splitFrame(data = model_data, 
+                         ratios = c(0.7, 0.15),  #partition data into 70%, 15%, 15% chunks
+                         seed = 1)  #setting a seed will guarantee reproducibility
+train <- splits[[1]]
+valid <- splits[[2]]
+test <- splits[[3]]
 ##################################
 #+#+#+ NEURAL NETWORk H2O #+#+#+#+
 ##################################
-#declaring the number of neuron to be used
-#in the hidden layer
-
-## Import Data to H2O Cluster
-train_hex <- as.h2o(train)
-test_hex <- as.h2o(test)
-
-## Split the dataset into 80:20 for training and validation
-train_hex_split <- h2o.splitFrame(train_hex, ratios = 0.8)
-
-for(n_label in 3:30){
-  ## Train a 50-node, three-hidden-layer Deep Neural Networks for 100 epochs
-  modelh2o <- h2o.deeplearning(x = (24:56),
-                               y = (n_label),
-                               training_frame = train_hex_split[[1]],
-                               validation_frame = train_hex_split[[2]],
-                               hidden = c(50, 50, 50),
-                               epochs = 100)
+for(n_label in y){
+  # Train a default DL
+  # First we will train a basic DL model with default parameters. The DL model will infer the response 
+  # distribution from the response encoding if it is not specified explicitly through the `distribution` 
+  # argument.  H2O's DL will not be reproducible if it is run on more than a single core, so in this example, 
+  # the performance metrics below may vary slightly from what you see on your machine.
+  # In H2O's DL, early stopping is enabled by default, so below, it will use the training set and 
+  # default stopping parameters to perform early stopping.
+  dl_fit1 <- h2o.deeplearning(x = x,
+                              y = n_label,
+                              training_frame = train,
+                              model_id = "dl_fit1",
+                              seed = 1)
   
-  ## Use the model for prediction and store the results in submission template
-  raw_sub <- as.matrix(h2o.predict(modelh2o, test_hex))
-  write.table(raw_sub, file = paste("analysis/",paste(names(train_hex)[n_label], ".txt",sep = ""), sep = ""), row.names=FALSE, col.names=FALSE)
+  # Train a DL with new architecture and more epochs.
+  # Next we will increase the number of epochs used in the GBM by setting `epochs=20` (the default is 10).  
+  # Increasing the number of epochs in a deep neural net may increase performance of the model, however, 
+  # you have to be careful not to overfit your model to your training data.  To automatically find the optimal number of epochs, 
+  # you must use H2O's early stopping functionality.  Unlike the rest of the H2O algorithms, H2O's DL will 
+  # use early stopping by default, so for comparison we will first turn off early stopping.  We do this in the next example 
+  # by setting `stopping_rounds=0`.
+  dl_fit2 <- h2o.deeplearning(x = x,
+                              y = n_label,
+                              training_frame = train,
+                              model_id = "dl_fit2",
+                              #validation_frame = valid,  #only used if stopping_rounds > 0
+                              epochs = 20,
+                              hidden= c(10,10),
+                              stopping_rounds = 0,  # disable early stopping
+                              seed = 1)
   
+  # Train a DL with early stopping
+  # This example will use the same model parameters as `dl_fit2`. This time, we will turn on 
+  # early stopping and specify the stopping criterion.  We will also pass a validation set, as is
+  # recommended for early stopping.
+  dl_fit3 <- h2o.deeplearning(x = x,
+                              y = n_label,
+                              training_frame = train,
+                              model_id = "dl_fit3",
+                              validation_frame = valid,  #in DL, early stopping is on by default
+                              epochs = 20,
+                              hidden = c(10,10),
+                              score_interval = 1,           #used for early stopping
+                              stopping_rounds = 3,          #used for early stopping
+                              stopping_metric = "AUC",      #used for early stopping
+                              stopping_tolerance = 0.0005,  #used for early stopping
+                              seed = 1)
+  
+  
+  # Let's compare the performance of the three DL models
+  dl_perf1 <- h2o.performance(model = dl_fit1,
+                              newdata = test)
+  dl_perf2 <- h2o.performance(model = dl_fit2,
+                              newdata = test)
+  dl_perf3 <- h2o.performance(model = dl_fit3,
+                              newdata = test)
+  
+  # Print model performance
+  dl_perf1
+  dl_perf2
+  dl_perf3
+  
+  # Retreive test set AUC
+  h2o.auc(dl_perf1)  
+  h2o.auc(dl_perf2)  
+  h2o.auc(dl_perf3)  
+  
+  # Scoring history
+  h2o.scoreHistory(dl_fit3)
+  
+  # Look at scoring history for third DL model
+  plot(dl_fit3, 
+       timestep = "epochs", 
+       metric = "AUC")
 }
+
+dbDisconnect()
