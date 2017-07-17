@@ -11,7 +11,7 @@ csv_ext <- ".csv"
 #+#+#+ SPLITTING (TRAIN/TEST) #+#+
 ##################################
 
-n_label <- "positionCB"
+n_label <- "positionSUB"
 y <- c("positionCB","positionCDM","positionCM","positionGK","positionLAM","positionLB","positionLCB","positionLCM","positionLDM","positionLM","positionLS","positionLW","positionRAM","positionRB","positionRCB","positionRCM","positionRDM","positionRM","positionRS","positionRW","positionST","positionSUB")
 x <- setdiff(names(model_data), c(y, "(Intercept)"))
 
@@ -43,7 +43,7 @@ model_data$positionST <- as.factor(model_data$positionST)
 model_data$positionSUB <- as.factor(model_data$positionSUB)
 
 #test factor
-h2o.levels(model_data$positionRCB)
+h2o.levels(model_data$positionSUB)
 
 # Partition the data into training, validation and test sets
 splits <- h2o.splitFrame(data = model_data, 
